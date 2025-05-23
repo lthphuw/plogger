@@ -10,12 +10,14 @@ import (
 
 func TestLogger(t *testing.T) {
 	testcases := []struct {
-		name       string
-		opts       plogger.Lister[plogger.LoggerOptions]
-		level      plogger.Level
-		entry      *plogger.Entry
-		wantNewErr bool
-		wantLogErr bool
+		name             string
+		opts             plogger.Lister[plogger.LoggerOptions]
+		level            plogger.Level
+		entry            *plogger.Entry
+		useJSONFormatter bool
+		useTextFormatter bool
+		wantNewErr       bool
+		wantLogErr       bool
 	}{
 		{
 			name:       "Empty entry",
@@ -132,10 +134,38 @@ func TestLogger(t *testing.T) {
 			level:      plogger.DebugLevel,
 			wantLogErr: true,
 		},
+		{
+			name:             "enable caller with JSON Formatter",
+			opts:             plogger.NewLoggerOptions().SetCaller(true),
+			entry:            plogger.NewEntry().SetMsg("hello world"),
+			level:            plogger.DebugLevel,
+			useJSONFormatter: true,
+			wantNewErr:       false,
+			wantLogErr:       false,
+		},
+		{
+			name:             "enable caller Text Formatter",
+			opts:             plogger.NewLoggerOptions().SetCaller(true),
+			entry:            plogger.NewEntry().SetMsg("hello world"),
+			level:            plogger.DebugLevel,
+			useTextFormatter: true,
+			wantNewErr:       false,
+			wantLogErr:       false,
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.name, func(t *testing.T) {
-			l, err := plogger.NewLogger(tt.opts)
+			opts := tt.opts
+			if tt.useTextFormatter {
+				f, _ := plogger.NewTextFormatter()
+				opts = plogger.NewLoggerOptions().SetCaller(true).SetFormatter(f)
+			}
+			if tt.useJSONFormatter {
+				f, _ := plogger.NewJSONFormatter()
+				opts = plogger.NewLoggerOptions().SetCaller(true).SetFormatter(f)
+			}
+
+			l, err := plogger.NewLogger(opts)
 			if (err != nil) != tt.wantNewErr {
 				t.Errorf("NewLogger got error %v, want %v", err, tt.wantNewErr)
 			}

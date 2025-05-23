@@ -28,7 +28,8 @@ func TestFileWriterConcurrent(t *testing.T) {
 	const writesPerGoroutine = 100
 
 	data := []byte(
-		`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ut euismod nunc. Mauris nec tristique lacus. Sed mollis, tellus id aliquam molestie, risus libero placerat felis, vel sagittis mauris lacus ut ex. Fusce placerat neque vel est rhoncus, non interdum libero hendrerit. Duis sit amet pharetra nisi. Phasellus a volutpat sem. Nullam pretium nisi a maximus volutpat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculous mus. Fusce interdum arcu nec scelerisque cursus.`,
+		`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ut euismod nunc. Mauris nec tristique lacus. Sed mollis, tellus id aliquam molestie, risus libero placerat felis, vel sagittis mauris lacus ut ex. Fusce placerat neque vel est rhoncus, non interdum libero hendrerit. Duis sit amet pharetra nisi. Phasellus a volutpat sem. Nullam pretium nisi a maximus volutpat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculoustouch .git/hooks/pre-commit
+ mus. Fusce interdum arcu nec scelerisque cursus.`,
 	)
 
 	// Expected Bytes that we want to write

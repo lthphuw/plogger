@@ -12,6 +12,9 @@ A lightweight logger for Go with structured output and pluggable formatter/write
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
+      <a href="#getting-started">Features</a>
+    </li>
+    <li>
       <a href="#getting-started">Getting Started</a>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -23,6 +26,13 @@ A lightweight logger for Go with structured output and pluggable formatter/write
   </ol>
 </details>
 
+## Features
+
+- High performance.
+- Modular design: easily swap `formatters` & `writers`.
+- Supports multiple outputs (`console`, `file`, `discard`) for `writer`.
+- Benchmark against `zap`, `zerolog`, `logrus`, etc.
+
 ## Getting Started
 
 Note that we only supports the two most recent minor versions of Go.
@@ -33,8 +43,10 @@ go get github.com/lthphuw/plogger@latest
 
 ## Usage
 
+### Quick start
+
 ```go
-formartter, _ := plogger.NewJSONFormatter()
+formatter, _ := plogger.NewJSONFormatter()
 writer, _ := plogger.NewConsoleWriter()
 
 // Create logger options using builder pattern
@@ -68,6 +80,34 @@ Output will look something like this:
   "msg": "Hi world",
   "timestamp": "2025-05-22T15:47:36+07:00"
 }
+```
+
+### Advanced Usage
+
+#### Custom fields
+
+```go
+
+entry := plogger.NewEntry().
+    SetMsg("User login").
+    AddField("user_id", 123).
+    AddField("ip", "192.168.1.1")
+
+logger.Info(entry)
+```
+
+#### Use File Writer (Supports Rotation & Safe Concurrency)
+
+```go
+fileWriter, _ := plogger.NewFileWriter(
+    plogger.NewFileWriterOptions().SetFilename("/var/log/app.log"),
+)
+
+logger, _ := plogger.NewLogger(
+    plogger.NewLoggerOptions().
+        SetWriter(fileWriter).
+        SetFormatter(formatter),
+)
 ```
 
 ## Benchmarks

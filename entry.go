@@ -2,6 +2,7 @@ package plogger
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 )
@@ -20,9 +21,9 @@ type Entry struct {
 	Timestamp time.Time      `json:"timestamp"` // Log timestamp
 	Level     Level          `json:"level"`     // Log level
 	Msg       string         `json:"msg"`       // Log message
-	FieldMap  map[string]any // Custom log fields
+	FieldMap  map[string]any `json:"-"`         // Custom log fields
 
-	caller bool // Whether to include caller info
+	caller bool `json:"-"` // Whether to include caller info
 }
 
 // NewEntry creates a new log entry with initialized field map and current timestamp.
@@ -80,9 +81,7 @@ func (e *Entry) SetFieldMap(fm map[string]any) *Entry {
 			delete(e.FieldMap, k)
 		}
 	}
-	for k, v := range fm {
-		e.FieldMap[k] = v
-	}
+	maps.Copy(e.FieldMap, fm)
 	return e
 }
 
@@ -100,9 +99,7 @@ func (e *Entry) AddFields(fields map[string]any) *Entry {
 	if e.FieldMap == nil {
 		e.FieldMap = make(map[string]any, len(fields))
 	}
-	for k, v := range fields {
-		e.FieldMap[k] = v
-	}
+	maps.Copy(e.FieldMap, fields)
 	return e
 }
 

@@ -10,12 +10,9 @@ import (
 	"github.com/lthphuw/plogger"
 )
 
-// BenchmarkAddingFields/plogger-11         	  128748	      9065 ns/op	    2854 B/op	      58 allocs/op
-// BenchmarkAddingFields/plogger-11         	  145815	      8283 ns/op	    2189 B/op	      54 allocs/op
 func BenchmarkAddingFields(b *testing.B) {
 	b.Logf("")
 	b.Logf("Logging with additional context at each log site.")
-
 	b.Run("plogger", func(b *testing.B) {
 		logger := newPLogger()
 		entry := plogger.NewEntry().SetMsg(getMessage(0)).SetFieldMap(ploggerFieldMap())

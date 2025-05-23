@@ -52,20 +52,30 @@ func TestSetMsg(t *testing.T) {
 func TestSetFieldMap(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    map[string]any
+		input    []map[string]any
 		expected int
 	}{
-		{"Set non-empty map", map[string]any{"a": 1, "b": "x"}, 2},
-		{"Set empty map", map[string]any{}, 0},
+		{"Set non-empty map", []map[string]any{{"a": 1, "b": "x"}}, 2},
+		{"Set empty map", []map[string]any{{}}, 0},
+		{"Set nil map", []map[string]any{nil}, 0},
+		{
+			"Set multi map",
+			[]map[string]any{nil, {"a": 1, "b": "x"}, {"aab": 32, "ab": "12x", "123": "#2"}},
+			3,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := plogger.NewEntry().SetFieldMap(tt.input)
+			e := plogger.NewEntry()
+			for _, inp := range tt.input {
+				e.SetFieldMap(inp)
+			}
 			if len(e.FieldMap) != tt.expected {
 				t.Errorf("expected field map size %d, got %d", tt.expected, len(e.FieldMap))
 			}
-			for k, v := range tt.input {
+
+			for k, v := range tt.input[len(tt.input)-1] {
 				if e.FieldMap[k] != v {
 					t.Errorf("expected key %s to have value %v", k, v)
 				}

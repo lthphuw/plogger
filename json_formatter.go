@@ -58,7 +58,7 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 	}
 
 	data[FieldKeyTime] = entry.Timestamp.Format(*f.TimestampFormat)
-	data[FieldKeyLevel] = entry.Level
+	data[FieldKeyLevel] = entry.Level.String()
 	data[FieldKeyMsg] = entry.Msg
 
 	if entry.caller {

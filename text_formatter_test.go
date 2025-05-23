@@ -1,21 +1,27 @@
 package plogger_test
 
 import (
+	"os"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/lthphuw/plogger"
+	"github.com/lthphuw/plogger/internal/color"
+	"golang.org/x/term"
 )
 
 func TestTextFormatter(t *testing.T) {
 	testcases := []struct {
-		name            string
-		opts            plogger.Lister[plogger.TextFormatterOptions]
-		timestamp       time.Time
-		entry           *plogger.Entry
-		wantNewError    bool
-		wantFormatError bool
-		wantBytes       []byte
+		name               string
+		opts               plogger.Lister[plogger.TextFormatterOptions]
+		timestamp          time.Time
+		entry              *plogger.Entry
+		wantNewError       bool
+		wantFormatError    bool
+		wantBytes          []byte
+		wantBytesInConsole []byte
 	}{
 		{
 			name:      "Test TextFormatter",
@@ -31,6 +37,11 @@ func TestTextFormatter(t *testing.T) {
 					Format("2006-01-02T15:04:05Z07:00") +
 					" level=info" + " msg=Hello world" + "\n",
 			),
+			wantBytesInConsole: []byte(
+				"timestamp=" + time.Now().
+					Format("2006-01-02T15:04:05Z07:00") +
+					" level=" + color.InfoColor.Add("info") + " msg=Hello world" + "\n",
+			),
 		},
 		{
 			name:      "Test TextFormatter disable color",
@@ -41,6 +52,11 @@ func TestTextFormatter(t *testing.T) {
 				Msg:   "Hello world",
 			},
 			wantBytes: []byte(
+				"timestamp=" + time.Now().
+					Format("2006-01-02T15:04:05Z07:00") +
+					" level=fatal" + " msg=Hello world" + "\n",
+			),
+			wantBytesInConsole: []byte(
 				"timestamp=" + time.Now().
 					Format("2006-01-02T15:04:05Z07:00") +
 					" level=fatal" + " msg=Hello world" + "\n",
@@ -67,6 +83,11 @@ func TestTextFormatter(t *testing.T) {
 					Format("2006-01-02T15:04:05Z07:00") +
 					" level=warn" + " msg=Hello world" + " key0=nil key1=2 key2=1 key3=3" + "\n",
 			),
+			wantBytesInConsole: []byte(
+				"timestamp=" + time.Now().
+					Format("2006-01-02T15:04:05Z07:00") +
+					" level=" + color.WarnColor.Add("warn") + " msg=Hello world" + " key0=nil key1=2 key2=1 key3=3" + "\n",
+			),
 		},
 		{
 			name:      "Test TextFormatter without sorting keys",
@@ -86,6 +107,11 @@ func TestTextFormatter(t *testing.T) {
 				"timestamp=" + time.Now().
 					Format("2006-01-02T15:04:05Z07:00") +
 					" level=trace" + " msg=Hello world" + " key1=2 key2=1 key3=3" + "\n",
+			),
+			wantBytesInConsole: []byte(
+				"timestamp=" + time.Now().
+					Format("2006-01-02T15:04:05Z07:00") +
+					" level=" + color.TraceColor.Add("trace") + " msg=Hello world" + " key1=2 key2=1 key3=3" + "\n",
 			),
 		},
 		{
@@ -112,6 +138,11 @@ func TestTextFormatter(t *testing.T) {
 					Format("2006-01-02T15:04:05Z07:00") +
 					" level=debug" + " msg=Hello world" + " key3=3 key1=2 key2=1" + "\n",
 			),
+			wantBytesInConsole: []byte(
+				"timestamp=" + time.Now().
+					Format("2006-01-02T15:04:05Z07:00") +
+					" level=" + color.DebugColor.Add("debug") + " msg=Hello world" + " key3=3 key1=2 key2=1" + "\n",
+			),
 		},
 		{
 			name:      "Test TextFormatter with format timestamp",
@@ -127,6 +158,11 @@ func TestTextFormatter(t *testing.T) {
 					Format("2006-01-02_15-04-05") +
 					" level=error" + " msg=Hello world" + "\n",
 			),
+			wantBytesInConsole: []byte(
+				"timestamp=" + time.Now().
+					Format("2006-01-02_15-04-05") +
+					" level=" + color.ErrorColor.Add("error") + " msg=Hello world" + "\n",
+			),
 		},
 	}
 
@@ -140,9 +176,18 @@ func TestTextFormatter(t *testing.T) {
 			if (err != nil) != tt.wantFormatError {
 				t.Errorf("Format() got error %v, want %v", err, tt.wantFormatError)
 			}
-			if string(b) != string(tt.wantBytes) {
+			if shouldColor() {
+				if string(b) != string(tt.wantBytesInConsole) {
+					t.Errorf("Format() got bytes %v, want %v", string(b), string(tt.wantBytes))
+				}
+			} else if string(b) != string(tt.wantBytes) {
 				t.Errorf("Format() got bytes %v, want %v", string(b), string(tt.wantBytes))
 			}
 		})
 	}
+}
+
+func shouldColor() bool {
+	return strings.ToLower(runtime.GOOS) != "windows" &&
+		(term.IsTerminal(int(os.Stdout.Fd())) || term.IsTerminal(int(os.Stderr.Fd())))
 }

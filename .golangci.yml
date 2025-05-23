@@ -13,6 +13,9 @@ linters:
   - errcheck
   - gocritic
   - ineffassign
+  exclusions:
+    paths:
+      - examples
 
 formatters:
   enable:
