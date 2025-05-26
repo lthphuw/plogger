@@ -3,7 +3,7 @@ package plogger
 import (
 	"reflect"
 
-	"github.com/lthphuw/plogger/internal/utils"
+	"github.com/lthphuw/pdefault"
 )
 
 // Setter function.
@@ -17,16 +17,9 @@ type Lister[T any] interface {
 func newOptions[T any](opts ...Lister[T]) (*T, error) {
 	args := new(T)
 
-	// Apply default value (if have)
-	if err := utils.ApplyDefaults(args); err != nil {
-		return nil, err
-	}
-
 	for _, opt := range opts {
 		if opt == nil || reflect.ValueOf(opt).IsNil() {
-			// Do nothing if the option is nil or if opt is nil but implicitly cast as
-			// an Options interface by the NewArgsFromOptions function. The latter
-			// case would look something like this:
+			// Do nothing if the option is nil or if opt is nil.
 			continue
 		}
 
@@ -40,5 +33,11 @@ func newOptions[T any](opts ...Lister[T]) (*T, error) {
 			}
 		}
 	}
+
+	// Apply defaults
+	if err := pdefault.Defaults(args); err != nil {
+		return nil, err
+	}
+
 	return args, nil
 }

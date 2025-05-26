@@ -7,6 +7,7 @@ require github.com/sirupsen/logrus v1.9.3
 require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
+	github.com/lthphuw/plogger v0.1.0-beta.3
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -18,7 +19,6 @@ require (
 require (
 	github.com/apex/log v1.9.0
 	github.com/go-kit/log v0.2.1
-	github.com/lthphuw/plogger v0.1.0-beta.2
 	github.com/rs/zerolog v1.34.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0

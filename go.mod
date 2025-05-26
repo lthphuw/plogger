@@ -1,10 +1,13 @@
 module github.com/lthphuw/plogger
 
-go 1.23.0
+go 1.24.3
 
 require golang.org/x/term v0.32.0
 
-require github.com/segmentio/asm v1.1.3 // indirect
+require (
+	github.com/lthphuw/pdefault v0.1.0-beta.3 // indirect
+	github.com/segmentio/asm v1.1.3 // indirect
+)
 
 require (
 	github.com/segmentio/encoding v0.4.1
